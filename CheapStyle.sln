@@ -3,18 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CheapStyle", "CheapStyle.vcxproj", "{361048EC-D739-4AD5-975B-4EC506CF06F9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheapStyle", "CheapStyle/CheapStyle.csproj", "{7EA3A73D-D51D-4AA4-AAE2-9A7CC074932F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
-		Release|Win32 = Release|Win32
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{361048EC-D739-4AD5-975B-4EC506CF06F9}.Debug|Win32.ActiveCfg = Debug|Win32
-		{361048EC-D739-4AD5-975B-4EC506CF06F9}.Debug|Win32.Build.0 = Debug|Win32
-		{361048EC-D739-4AD5-975B-4EC506CF06F9}.Release|Win32.ActiveCfg = Release|Win32
-		{361048EC-D739-4AD5-975B-4EC506CF06F9}.Release|Win32.Build.0 = Release|Win32
+		{7EA3A73D-D51D-4AA4-AAE2-9A7CC074932F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EA3A73D-D51D-4AA4-AAE2-9A7CC074932F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EA3A73D-D51D-4AA4-AAE2-9A7CC074932F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EA3A73D-D51D-4AA4-AAE2-9A7CC074932F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
