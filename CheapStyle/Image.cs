@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.IO.Compression;
+using ComponentAce.Compression.Libs.zlib;
 
 namespace CheapStyle
 {
@@ -55,7 +56,9 @@ namespace CheapStyle
             byte[] compData = stream.LoadBytes(compSize);
             byte[] fullData = new byte[fullSize];
 
-            // TODO: Uncompress
+            MemoryStream fullDataStream = new MemoryStream(fullData, true);
+            ZOutputStream zlibStream = new ZOutputStream(fullDataStream);
+            zlibStream.Write(compData, 0, compSize);
 
             return true;
         }
