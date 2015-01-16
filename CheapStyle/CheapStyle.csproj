@@ -51,6 +51,7 @@
     </ApplicationDefinition>
     <Compile Include="Bytes.cs" />
     <Compile Include="Image.cs" />
+    <Compile Include="ImageType.cs" />
     <Compile Include="Style.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

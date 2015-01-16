@@ -33,11 +33,18 @@ namespace CheapStyle
             return value;
         }
 
-        public uint LoadUint16()
+        public ushort LoadUshort()
         {
             ushort value = BitConverter.ToUInt16(Buffer, IntPos);
             Position += sizeof(ushort);
             return value;
+        }
+
+        public int LoadUshortAsInt()
+        {
+            ushort value = BitConverter.ToUInt16(Buffer, IntPos);
+            Position += sizeof(ushort);
+            return (int)value;
         }
 
         public byte LoadByte()
@@ -61,6 +68,19 @@ namespace CheapStyle
             string value = Encoding.ASCII.GetString(Buffer, IntPos, length - 1);
             IntPos += length;
             return value;
+        }
+
+        public ushort LoadColor16()
+        {
+            return LoadUshort();
+        }
+
+        public byte[] LoadBytes(int size)
+        {
+            byte[] bytes = new byte[size];
+            Array.Copy(Buffer, IntPos, bytes, 0, size);
+            IntPos += size;
+            return bytes;
         }
     }
 }
