@@ -20,33 +20,36 @@ namespace CheapStyle
 
         private Style()
         {
+            Header = string.Empty;
+            Name = string.Empty;
+            Author = string.Empty;
         }
 
         public static Style Create(string file)
         {
             Style style = new Style();
-            if (style.Load(file))
-            {
-                return style;
-            }
-
-            return null;
+            return style.Load(file) ? style : null;
         }
+
+        public string Header { get; set; }
+        public string Name { get; set; }
+        public string Author { get; set; }
 
         private bool Load(string file)
         {
-            byte[] bytes = null;
-
             try
             {
-                bytes = File.ReadAllBytes(file);
+                return Load(File.ReadAllBytes(file));
             }
             catch
             {
                 return false;
             }
+        }
 
-            MemoryStream stream = new MemoryStream(bytes);
+        private bool Load(byte[] bytes)
+        {
+            Bytes stream = new Bytes(bytes);
 
             _posFooter = stream.LoadUint();
             stream.Position = _posFooter;
@@ -64,6 +67,31 @@ namespace CheapStyle
             _posSounds = stream.LoadUint();
             _posImages = stream.LoadUint();
             _posFiles = stream.LoadUint();
+
+            return LoadHeader(bytes);
+        }
+
+        private bool LoadHeader(byte[] bytes)
+        {
+            Bytes stream = new Bytes(bytes);
+
+            if (_posHeader != 0)
+            {
+                stream.Position = _posHeader;
+                Header = stream.LoadString();
+            }
+
+            if (_posStyle != 0)
+            {
+                stream.Position = _posStyle;
+                Name = stream.LoadString();
+            }
+
+            if (_posAuthor != 0)
+            {
+                stream.Position = _posAuthor;
+                Author = stream.LoadString();
+            }
 
             return true;
         }
