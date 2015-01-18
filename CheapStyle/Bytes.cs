@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Text;
+using ComponentAce.Compression.Libs.zlib;
 
 namespace CheapStyle
 {
@@ -81,6 +83,20 @@ namespace CheapStyle
             Array.Copy(Buffer, IntPos, bytes, 0, size);
             IntPos += size;
             return bytes;
+        }
+
+        public byte[] LoadCompressedBytes()
+        {
+            int compSize = LoadInt();
+            int fullSize = LoadInt();
+            byte[] compData = LoadBytes(compSize);
+            byte[] fullData = new byte[fullSize];
+
+            MemoryStream fullDataStream = new MemoryStream(fullData, true);
+            ZOutputStream zlibStream = new ZOutputStream(fullDataStream);
+            zlibStream.Write(compData, 0, compSize);
+
+            return fullData;
         }
     }
 }

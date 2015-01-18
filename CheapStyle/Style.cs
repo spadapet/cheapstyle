@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace CheapStyle
 {
-    internal class Style
+    internal class Style : IDisposable
     {
         private uint _posHeader;
         private uint _posStyle;
@@ -191,6 +192,10 @@ namespace CheapStyle
             Bytes stream = new Bytes(bytes);
 
             return true;
+        }
+
+        public void Dispose()
+        {
         }
     }
 }
