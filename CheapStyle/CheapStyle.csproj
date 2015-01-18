@@ -50,7 +50,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bytes.cs" />
-    <Compile Include="Image.cs" />
+    <Compile Include="StyleImage.cs" />
     <Compile Include="ImageType.cs" />
     <Compile Include="Style.cs" />
     <Compile Include="zlib\Adler32.cs" />

@@ -1,62 +1,117 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace CheapStyle
 {
+    /// <summary>
+    /// All images, sounds, etc. loaded from a style file. All styles are
+    /// cached until they are disposed.
+    /// </summary>
     internal class Style : IDisposable
     {
-        private uint _posHeader;
-        private uint _posStyle;
-        private uint _posAuthor;
-        private uint _posStandards;
-        private uint _posSketches;
-        private uint _posErasers;
-        private uint _posCharacters;
-        private uint _posObjects;
-        private uint _posGraphics;
-        private uint _posFooter;
-        private uint _posMusic;
-        private uint _posSounds;
-        private uint _posImages;
-        private uint _posFiles;
+        private static List<Style> _styleCache;
+        private static object _lock;
 
-        private Image _imageStandards;
-        private Image _imageSketches;
-        private Image _imageErasers;
-        private Image _imageCharacters;
-        private Image _imageObjects;
-        private Image _imageGraphics;
-        private ICollection<Image> _imageOthers;
+        private int _posHeader;
+        private int _posStyle;
+        private int _posAuthor;
+        private int _posStandards;
+        private int _posSketches;
+        private int _posErasers;
+        private int _posCharacters;
+        private int _posObjects;
+        private int _posGraphics;
+        private int _posFooter;
+        private int _posMusic;
+        private int _posSounds;
+        private int _posImages;
+        private int _posFiles;
 
-        private Style()
+        private StyleImage _imageStandards;
+        private StyleImage _imageSketches;
+        private StyleImage _imageErasers;
+        private StyleImage _imageCharacters;
+        private StyleImage _imageObjects;
+        private StyleImage _imageGraphics;
+        private IList<StyleImage> _imageOthers;
+
+        static Style()
         {
-            File = string.Empty;
+            _styleCache = new List<Style>();
+            _lock = new object();
+        }
+
+        private Style(string filePath)
+        {
+            FilePath = filePath ?? string.Empty;
             Header = string.Empty;
             Name = string.Empty;
             Author = string.Empty;
 
-            _imageOthers = new Image[0];
+            _imageOthers = new List<StyleImage>();
+            _styleCache.Add(this);
+
+            Load(System.IO.File.ReadAllBytes(filePath));
+        }
+
+        public void Dispose()
+        {
+            lock (_lock)
+            {
+                _styleCache.Remove(this);
+
+                foreach (StyleImage image in AllImages)
+                {
+                    image.Dispose();
+                }
+            }
         }
 
         public static Style Create(string file)
         {
-            Style style = new Style();
-            return style.Load(file) ? style : null;
+            // Only one style can be loaded at a time
+            lock (_lock)
+            {
+                string name = System.IO.Path.GetFileName(file);
+
+                // See if the style was already loaded
+                foreach (Style existingStyle in _styleCache)
+                {
+                    if (name.Equals(existingStyle.FileName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return existingStyle;
+                    }
+                }
+
+                // See if the file is within the directory of a loaded style
+                if (!System.IO.File.Exists(file) && !System.IO.Path.IsPathRooted(file))
+                {
+                    foreach (Style existingStyle in _styleCache)
+                    {
+                        string tryPath = System.IO.Path.Combine(existingStyle.FileDir, file);
+                        if (System.IO.File.Exists(tryPath))
+                        {
+                            file = tryPath;
+                            break;
+                        }
+                    }
+                }
+
+                return new Style(file);
+            }
         }
 
-        public string File { get; set; }
+        public string FilePath { get; set; }
+        public string FileName { get { return System.IO.Path.GetFileName(FilePath); } }
+        public string FileDir { get { return System.IO.Path.GetDirectoryName(FilePath); } }
         public string Header { get; set; }
         public string Name { get; set; }
         public string Author { get; set; }
 
-        public Image GetImage(ImageType type)
+        public StyleImage GetImage(ImageType type)
         {
             switch (type)
             {
-                default:
-                    return null;
-
                 case ImageType.Characters:
                     return _imageCharacters;
 
@@ -74,85 +129,91 @@ namespace CheapStyle
 
                 case ImageType.Standards:
                     return _imageStandards;
+
+                default:
+                    return null;
             }
         }
 
-        public ICollection<Image> OtherImages
+        public ICollection<StyleImage> OtherImages
         {
             get { return _imageOthers; }
         }
 
-        private bool Load(string file)
+        public IEnumerable<StyleImage> AllImages
         {
-            try
+            get
             {
-                File = file;
-                return Load(System.IO.File.ReadAllBytes(file));
-            }
-            catch
-            {
-                return false;
+                yield return _imageCharacters;
+                yield return _imageErasers;
+                yield return _imageGraphics;
+                yield return _imageObjects;
+                yield return _imageSketches;
+                yield return _imageStandards;
+
+                foreach (StyleImage image in _imageOthers)
+                {
+                    yield return image;
+                }
             }
         }
 
-        private bool Load(byte[] bytes)
+        private void Load(byte[] bytes)
         {
             Bytes stream = new Bytes(bytes);
 
-            _posFooter = stream.LoadUint();
-            stream.Position = _posFooter;
+            _posFooter = stream.LoadInt();
+            stream.IntPos = _posFooter;
 
-            _posHeader = stream.LoadUint();
-            _posStyle = stream.LoadUint();
-            _posAuthor = stream.LoadUint();
-            _posStandards = stream.LoadUint();
-            _posSketches = stream.LoadUint();
-            _posErasers = stream.LoadUint();
-            _posCharacters = stream.LoadUint();
-            _posObjects = stream.LoadUint();
-            _posGraphics = stream.LoadUint();
-            _posMusic = stream.LoadUint();
-            _posSounds = stream.LoadUint();
-            _posImages = stream.LoadUint();
-            _posFiles = stream.LoadUint();
+            _posHeader = stream.LoadInt();
+            _posStyle = stream.LoadInt();
+            _posAuthor = stream.LoadInt();
+            _posStandards = stream.LoadInt();
+            _posSketches = stream.LoadInt();
+            _posErasers = stream.LoadInt();
+            _posCharacters = stream.LoadInt();
+            _posObjects = stream.LoadInt();
+            _posGraphics = stream.LoadInt();
+            _posMusic = stream.LoadInt();
+            _posSounds = stream.LoadInt();
+            _posImages = stream.LoadInt();
+            _posFiles = stream.LoadInt();
 
-            return LoadHeader(bytes) &&
-                LoadStandardImages(bytes) &&
-                LoadSounds(bytes) &&
-                LoadMusic(bytes);
+            LoadHeader(bytes);
+            LoadStandardImages(bytes);
+            LoadSounds(bytes);
+            LoadMusic(bytes);
         }
 
-        private bool LoadHeader(byte[] bytes)
+        private void LoadHeader(byte[] bytes)
         {
             Bytes stream = new Bytes(bytes);
 
             if (_posHeader != 0)
             {
-                stream.Position = _posHeader;
+                stream.IntPos = _posHeader;
                 Header = stream.LoadString();
             }
 
             if (Header != "Cheapo Copycat Level Editor")
             {
-                return false;
+                throw new Exception("Invalid style file");
             }
 
             if (_posStyle != 0)
             {
-                stream.Position = _posStyle;
+                stream.IntPos = _posStyle;
                 Name = stream.LoadString();
             }
 
             if (_posAuthor != 0)
             {
-                stream.Position = _posAuthor;
+                stream.IntPos = _posAuthor;
                 Author = stream.LoadString();
             }
-
-            return true;
         }
 
-        private bool LoadStandardImages(byte[] bytes)
+        private void LoadStandardImages(byte[] bytes)
         {
             _imageStandards = LoadStandardImage(bytes, _posStandards, ImageType.Standards);
             _imageSketches = LoadStandardImage(bytes, _posSketches, ImageType.Sketches);
@@ -160,42 +221,33 @@ namespace CheapStyle
             _imageCharacters = LoadStandardImage(bytes, _posCharacters, ImageType.Characters);
             _imageObjects = LoadStandardImage(bytes, _posObjects, ImageType.Objects);
             _imageGraphics = LoadStandardImage(bytes, _posGraphics, ImageType.Graphics);
-
-            return true;
         }
 
-        private Image LoadStandardImage(byte[] bytes, uint pos, ImageType type)
+        private static StyleImage LoadStandardImage(byte[] bytes, int pos, ImageType type)
         {
-            Bytes stream = new Bytes(bytes);
-            stream.Position = pos;
-
-            return Image.CreateStandard(File, stream, type);
+            Bytes stream = new Bytes(bytes, pos);
+            return StyleImage.CreateStandard(stream, type);
         }
 
-        private bool LoadOtherImages(byte[] bytes)
+        private void LoadOtherImages(byte[] bytes)
         {
-            Bytes stream = new Bytes(bytes);
-            stream.Position = _posImages;
+            Bytes stream = new Bytes(bytes, _posImages);
 
-            return true;
+            // TODO
         }
 
-        private bool LoadSounds(byte[] bytes)
+        private void LoadSounds(byte[] bytes)
         {
-            Bytes stream = new Bytes(bytes);
+            Bytes stream = new Bytes(bytes, _posSounds);
 
-            return true;
+            // TODO
         }
 
-        private bool LoadMusic(byte[] bytes)
+        private void LoadMusic(byte[] bytes)
         {
-            Bytes stream = new Bytes(bytes);
+            Bytes stream = new Bytes(bytes, _posMusic);
 
-            return true;
-        }
-
-        public void Dispose()
-        {
+            // TODO
         }
     }
 }

@@ -10,9 +10,10 @@ namespace CheapStyle
         public byte[] Buffer { get; private set; }
         public uint Position { get; set; }
 
-        public Bytes(byte[] buffer)
+        public Bytes(byte[] buffer, int position = 0)
         {
             Buffer = buffer;
+            IntPos = position;
         }
 
         public int IntPos

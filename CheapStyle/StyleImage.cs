@@ -1,61 +1,63 @@
 ﻿using System;
 using System.IO;
-using System.IO.Compression;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ComponentAce.Compression.Libs.zlib;
 
 namespace CheapStyle
 {
-    internal class Image : IDisposable
+    /// <summary>
+    /// An image loaded from a style file
+    /// </summary>
+    internal class StyleImage : IDisposable
     {
         private int _width;
         private int _height;
+        private ushort _bgColor;
         private ushort[] _colors;
-        WriteableBitmap _bitmap;
+        private WriteableBitmap _bitmap;
 
-        private Image()
+        private StyleImage(Bytes stream, ImageType type)
         {
-            _colors = new ushort[0];
+            LoadStandard(stream, type);
         }
 
-        public static Image CreateStandard(string styleFile, Bytes stream, ImageType type)
+        public void Dispose()
         {
-            Image image = new Image();
-            return image.LoadStandard(styleFile, stream, type) ? image : null;
+            CopyFrom(null);
         }
 
-        private bool LoadStandard(string styleFile, Bytes stream, ImageType type)
+        public static StyleImage CreateStandard(Bytes stream, ImageType type)
         {
-            byte loadMethod = stream.LoadByte();
+            return new StyleImage(stream, type);
+        }
 
-            switch (loadMethod)
+        private void LoadStandard(Bytes stream, ImageType type)
+        {
+            switch (stream.LoadByte())
             {
-                default:
-                    return false;
-
                 case 1: // image is here
-                    return LoadGraphic(stream) &&
-                        LoadSprites(stream) &&
-                        LoadObjects(stream);
+                    LoadGraphic(stream);
+                    LoadSprites(stream);
+                    LoadObjects(stream);
+                    break;
 
                 case 2: // image is in another style file
-                    {
-                        string otherStyleName = stream.LoadString();
-                        string otherStyleFile = Path.Combine(Path.GetDirectoryName(styleFile), otherStyleName);
+                    string name = stream.LoadString();
+                    Style style = Style.Create(name);
+                    CopyFrom(style.GetImage(type));
+                    break;
 
-                        Style otherStyle = Style.Create(otherStyleFile);
-                        return otherStyle != null && CopyFrom(otherStyle.GetImage(type));
-                    }
+                default:
+                    throw new Exception("Invalid standard image format");
             }
         }
 
-        private bool LoadGraphic(Bytes stream)
+        private void LoadGraphic(Bytes stream)
         {
             if (stream.LoadByte() != 1)
             {
-                return false;
+                throw new Exception("Invalid image type");
             }
 
             int width = stream.LoadUshortAsInt();
@@ -111,12 +113,13 @@ namespace CheapStyle
                         break;
 
                     default:
-                        return false;
+                        throw new Exception("Invalid image row type");
                 }
             }
 
             _width = width;
             _height = height;
+            _bgColor = bgColor;
             _colors = imageColors;
 
             _bitmap = new WriteableBitmap(_width, _height, 96, 96, PixelFormats.Bgr565, null);
@@ -124,54 +127,42 @@ namespace CheapStyle
             _bitmap.WritePixels(new Int32Rect(0, 0, _width, _height), _colors, _width * sizeof(ushort), 0);
             _bitmap.Unlock();
             _bitmap.Freeze();
-
-            return true;
         }
 
-        private bool LoadSprites(Bytes stream)
+        private void LoadSprites(Bytes stream)
         {
-            return true;
+            // TODO
         }
 
-        private bool LoadObjects(Bytes stream)
+        private void LoadObjects(Bytes stream)
         {
-            return true;
+            // TODO
         }
 
-        private bool CopyFrom(Image image)
+        private void CopyFrom(StyleImage image)
         {
-            _width = image._width;
-            _height = image._height;
-            _colors = image._colors;
+            _width = 0;
+            _height = 0;
+            _colors = null;
+            _bitmap = null;
 
-            return true;
-        }
-
-        public bool Save(string file)
-        {
-            if (_bitmap != null)
+            if (image != null)
             {
-                try
-                {
-                    using (FileStream tempStream = new FileStream(file, FileMode.Create))
-                    {
-                        PngBitmapEncoder encoder = new PngBitmapEncoder();
-                        encoder.Frames.Add(BitmapFrame.Create(_bitmap));
-                        encoder.Save(tempStream);
-                        return true;
-                    }
-                }
-                catch
-                {
-                    return false;
-                }
+                _width = image._width;
+                _height = image._height;
+                _colors = image._colors;
+                _bitmap = image._bitmap;
             }
-
-            return false;
         }
 
-        public void Dispose()
+        public void Save(string filePath)
         {
+            using (FileStream tempStream = new FileStream(filePath, FileMode.Create))
+            {
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(_bitmap));
+                encoder.Save(tempStream);
+            }
         }
     }
 }
