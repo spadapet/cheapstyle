@@ -9,7 +9,7 @@ namespace CheapStyle
 {
     public partial class MainWindow : Window, System.Windows.Forms.IWin32Window
     {
-        private bool manuallyChoseDest;
+        private bool _manuallyChoseDest;
 
         public MainWindow()
         {
@@ -30,7 +30,7 @@ namespace CheapStyle
             {
                 StyleTextBox.Text = dialog.FileName;
 
-                if (!manuallyChoseDest)
+                if (!_manuallyChoseDest)
                 {
                     string dir = Path.GetDirectoryName(dialog.FileName);
                     string file = Path.GetFileNameWithoutExtension(dialog.FileName);
@@ -49,7 +49,7 @@ namespace CheapStyle
                 if (dialog.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
                 {
                     DestTextBox.Text = dialog.SelectedPath;
-                    manuallyChoseDest = true;
+                    _manuallyChoseDest = true;
                 }
             }
         }

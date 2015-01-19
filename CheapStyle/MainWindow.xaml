@@ -10,9 +10,9 @@
         <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="This program will extract data from a style file."/>
         <TextBlock HorizontalAlignment="Left" Margin="10,31,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Choose a style file:"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Choose a destination directory:"/>
-        <TextBox Name="StyleTextBox" HorizontalAlignment="Left" Height="23" Margin="10,52,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="300"/>
+        <TextBox Name="StyleTextBox" HorizontalAlignment="Left" Height="23" Margin="10,52,0,0" VerticalAlignment="Top" Width="300"/>
         <Button Name="StyleChoose" Content="Choose..." HorizontalAlignment="Left" Margin="315,55,0,0" VerticalAlignment="Top" Width="75" Click="OnChooseStyle"/>
-        <TextBox Name="DestTextBox" HorizontalAlignment="Left" Height="23" Margin="10,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="300"/>
+        <TextBox Name="DestTextBox" HorizontalAlignment="Left" Height="23" Margin="10,101,0,0" VerticalAlignment="Top" Width="300"/>
         <Button Name="DestChoose" Content="Choose..." HorizontalAlignment="Left" Margin="315,103,0,0" VerticalAlignment="Top" Width="75" Click="OnChooseDest"/>
         <Button Content="Ok" Margin="0,0,90.333,8" HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Bottom" Click="OnOk"/>
         <Button Content="Cancel" Margin="0,0,10.333,8" Height="21" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Click="OnCancel"/>

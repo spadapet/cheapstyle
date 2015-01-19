@@ -174,11 +174,11 @@ namespace CheapStyle
 
         public void SavePng(string filePath)
         {
-            using (FileStream tempStream = new FileStream(filePath, FileMode.Create))
+            using (FileStream stream = new FileStream(filePath, FileMode.Create))
             {
                 PngBitmapEncoder encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(_bitmap));
-                encoder.Save(tempStream);
+                encoder.Save(stream);
             }
         }
     }
