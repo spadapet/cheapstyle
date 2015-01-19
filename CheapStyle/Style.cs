@@ -169,6 +169,7 @@ namespace CheapStyle
             _posCharacters = stream.LoadInt();
             _posObjects = stream.LoadInt();
             _posGraphics = stream.LoadInt();
+            _posFooter = stream.LoadInt();
             _posMusic = stream.LoadInt();
             _posSounds = stream.LoadInt();
             _posImages = stream.LoadInt();
@@ -176,6 +177,7 @@ namespace CheapStyle
 
             LoadHeader(bytes);
             LoadStandardImages(bytes);
+            LoadOtherImages(bytes);
             LoadSounds(bytes);
             LoadMusic(bytes);
         }
@@ -233,10 +235,23 @@ namespace CheapStyle
 
         private void LoadOtherImages(byte[] bytes)
         {
-            Bytes stream = new Bytes(bytes, _posImages);
+            if (_posImages != 0)
+            {
+                Bytes stream = new Bytes(bytes, _posImages);
+                if (stream.LoadByte() != 1)
+                {
+                    throw new Exception("Invalid image type in style");
+                }
 
-            // TODO
-            // _allImages.Add(image);
+                int count = stream.LoadByteAsInt();
+                for (int i = 0; i < count; i++)
+                {
+                    int index = stream.LoadByteAsInt();
+                    StyleImage image = StyleImage.CreateOther(stream, index);
+                    _imageOthers.Add(image);
+                    _allImages.Add(image);
+                }
+            }
         }
 
         private void LoadSounds(byte[] bytes)

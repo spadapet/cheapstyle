@@ -23,7 +23,15 @@ namespace CheapStyle
         {
             _type = type;
 
-            LoadStandard(stream);
+            Load(stream);
+        }
+
+        private StyleImage(Bytes stream, int index)
+        {
+            _type = StyleImageType.Other;
+            _name = string.Format("Other{0}", index);
+
+            Load(stream);
         }
 
         public void Dispose()
@@ -36,9 +44,14 @@ namespace CheapStyle
             return new StyleImage(stream, type);
         }
 
-        private void LoadStandard(Bytes stream)
+        public static StyleImage CreateOther(Bytes stream, int index)
         {
-            switch (stream.LoadByte())
+            return new StyleImage(stream, index);
+        }
+
+        private void Load(Bytes stream)
+        {
+            switch (_type != StyleImageType.Other ? stream.LoadByte() : 1)
             {
                 case 1: // image is here
                     LoadGraphic(stream);
@@ -70,6 +83,11 @@ namespace CheapStyle
             ushort[] pixels = new ushort[width * height];
             byte[] imageBytes = stream.LoadCompressedBytes();
             Bytes imageStream = new Bytes(imageBytes);
+
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                pixels[i] = bgColor;
+            }
 
             for (bool done = false; !done; )
             {
@@ -164,11 +182,6 @@ namespace CheapStyle
             get
             {
                 return _name ?? _type.ToString();
-            }
-
-            set
-            {
-                _name = value;
             }
         }
 
