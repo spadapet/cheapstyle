@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -119,12 +120,22 @@ namespace CheapStyle
 
         private void Extract(string file, string dest)
         {
-            CheapStyle.Style style = CheapStyle.Style.Create(file);
-            if (style == null)
+            try
             {
-                MessageBox.Show(this, "Invalid style file: " + file);
+                using (CheapStyle.Style style = CheapStyle.Style.Create(file))
+                {
+                    style.Save(dest);
+                }
+            }
+            catch (Exception exception)
+            {
+                string message = string.Format("Invalid style file: {0}\r\nError message: {1}", file, exception.Message);
+                MessageBox.Show(this, message);
                 return;
             }
+
+            Process.Start(dest);
+            Close();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace CheapStyle
 {
-    internal enum ImageType
+    internal enum StyleImageType
     {
         None,
         Standards,

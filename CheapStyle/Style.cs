@@ -34,6 +34,7 @@ namespace CheapStyle
         private StyleImage _imageObjects;
         private StyleImage _imageGraphics;
         private IList<StyleImage> _imageOthers;
+        private IList<StyleImage> _allImages;
 
         static Style()
         {
@@ -49,6 +50,7 @@ namespace CheapStyle
             Author = string.Empty;
 
             _imageOthers = new List<StyleImage>();
+            _allImages = new List<StyleImage>();
             _styleCache.Add(this);
 
             Load(System.IO.File.ReadAllBytes(filePath));
@@ -108,26 +110,26 @@ namespace CheapStyle
         public string Name { get; set; }
         public string Author { get; set; }
 
-        public StyleImage GetImage(ImageType type)
+        public StyleImage GetImage(StyleImageType type)
         {
             switch (type)
             {
-                case ImageType.Characters:
+                case StyleImageType.Characters:
                     return _imageCharacters;
 
-                case ImageType.Erasers:
+                case StyleImageType.Erasers:
                     return _imageErasers;
 
-                case ImageType.Graphics:
+                case StyleImageType.Graphics:
                     return _imageGraphics;
 
-                case ImageType.Objects:
+                case StyleImageType.Objects:
                     return _imageObjects;
 
-                case ImageType.Sketches:
+                case StyleImageType.Sketches:
                     return _imageSketches;
 
-                case ImageType.Standards:
+                case StyleImageType.Standards:
                     return _imageStandards;
 
                 default:
@@ -144,17 +146,7 @@ namespace CheapStyle
         {
             get
             {
-                yield return _imageCharacters;
-                yield return _imageErasers;
-                yield return _imageGraphics;
-                yield return _imageObjects;
-                yield return _imageSketches;
-                yield return _imageStandards;
-
-                foreach (StyleImage image in _imageOthers)
-                {
-                    yield return image;
-                }
+                return _allImages;
             }
         }
 
@@ -215,18 +207,25 @@ namespace CheapStyle
 
         private void LoadStandardImages(byte[] bytes)
         {
-            _imageStandards = LoadStandardImage(bytes, _posStandards, ImageType.Standards);
-            _imageSketches = LoadStandardImage(bytes, _posSketches, ImageType.Sketches);
-            _imageErasers = LoadStandardImage(bytes, _posErasers, ImageType.Erasers);
-            _imageCharacters = LoadStandardImage(bytes, _posCharacters, ImageType.Characters);
-            _imageObjects = LoadStandardImage(bytes, _posObjects, ImageType.Objects);
-            _imageGraphics = LoadStandardImage(bytes, _posGraphics, ImageType.Graphics);
+            _imageStandards = LoadStandardImage(bytes, _posStandards, StyleImageType.Standards);
+            _imageSketches = LoadStandardImage(bytes, _posSketches, StyleImageType.Sketches);
+            _imageErasers = LoadStandardImage(bytes, _posErasers, StyleImageType.Erasers);
+            _imageCharacters = LoadStandardImage(bytes, _posCharacters, StyleImageType.Characters);
+            _imageObjects = LoadStandardImage(bytes, _posObjects, StyleImageType.Objects);
+            _imageGraphics = LoadStandardImage(bytes, _posGraphics, StyleImageType.Graphics);
         }
 
-        private static StyleImage LoadStandardImage(byte[] bytes, int pos, ImageType type)
+        private StyleImage LoadStandardImage(byte[] bytes, int pos, StyleImageType type)
         {
-            Bytes stream = new Bytes(bytes, pos);
-            return StyleImage.CreateStandard(stream, type);
+            StyleImage image = null;
+            if (pos != 0)
+            {
+                Bytes stream = new Bytes(bytes, pos);
+                image = StyleImage.CreateStandard(stream, type);
+                _allImages.Add(image);
+            }
+
+            return image;
         }
 
         private void LoadOtherImages(byte[] bytes)
@@ -234,6 +233,7 @@ namespace CheapStyle
             Bytes stream = new Bytes(bytes, _posImages);
 
             // TODO
+            // _allImages.Add(image);
         }
 
         private void LoadSounds(byte[] bytes)
@@ -248,6 +248,15 @@ namespace CheapStyle
             Bytes stream = new Bytes(bytes, _posMusic);
 
             // TODO
+        }
+
+        public void Save(string dest)
+        {
+            foreach (StyleImage image in AllImages)
+            {
+                string file = System.IO.Path.Combine(dest, image.Name + ".png");
+                image.SavePng(file);
+            }
         }
     }
 }

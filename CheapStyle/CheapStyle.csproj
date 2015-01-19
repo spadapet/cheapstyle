@@ -51,7 +51,7 @@
     </ApplicationDefinition>
     <Compile Include="Bytes.cs" />
     <Compile Include="StyleImage.cs" />
-    <Compile Include="ImageType.cs" />
+    <Compile Include="StyleImageType.cs" />
     <Compile Include="Style.cs" />
     <Compile Include="zlib\Adler32.cs" />
     <Compile Include="zlib\Deflate.cs" />

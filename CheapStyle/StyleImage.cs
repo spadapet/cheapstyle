@@ -14,12 +14,16 @@ namespace CheapStyle
         private int _width;
         private int _height;
         private ushort _bgColor;
-        private ushort[] _colors;
+        private ushort[] _pixels;
         private WriteableBitmap _bitmap;
+        private StyleImageType _type;
+        private string _name;
 
-        private StyleImage(Bytes stream, ImageType type)
+        private StyleImage(Bytes stream, StyleImageType type)
         {
-            LoadStandard(stream, type);
+            _type = type;
+
+            LoadStandard(stream);
         }
 
         public void Dispose()
@@ -27,12 +31,12 @@ namespace CheapStyle
             CopyFrom(null);
         }
 
-        public static StyleImage CreateStandard(Bytes stream, ImageType type)
+        public static StyleImage CreateStandard(Bytes stream, StyleImageType type)
         {
             return new StyleImage(stream, type);
         }
 
-        private void LoadStandard(Bytes stream, ImageType type)
+        private void LoadStandard(Bytes stream)
         {
             switch (stream.LoadByte())
             {
@@ -45,7 +49,7 @@ namespace CheapStyle
                 case 2: // image is in another style file
                     string name = stream.LoadString();
                     Style style = Style.Create(name);
-                    CopyFrom(style.GetImage(type));
+                    CopyFrom(style.GetImage(_type));
                     break;
 
                 default:
@@ -63,9 +67,9 @@ namespace CheapStyle
             int width = stream.LoadUshortAsInt();
             int height = stream.LoadUshortAsInt();
             ushort bgColor = stream.LoadColor16();
-            ushort[] imageColors = new ushort[width * height];
-            byte[] fullData = stream.LoadCompressedBytes();
-            Bytes imageStream = new Bytes(fullData);
+            ushort[] pixels = new ushort[width * height];
+            byte[] imageBytes = stream.LoadCompressedBytes();
+            Bytes imageStream = new Bytes(imageBytes);
 
             for (bool done = false; !done; )
             {
@@ -89,7 +93,7 @@ namespace CheapStyle
 
                                 for (int x = start; x < end; x++)
                                 {
-                                    imageColors[width * y + x] = color;
+                                    pixels[width * y + x] = color;
                                 }
 
                                 start = end;
@@ -107,7 +111,7 @@ namespace CheapStyle
                             for (int x = start; x <= end; x++)
                             {
                                 ushort color = imageStream.LoadColor16();
-                                imageColors[width * y + x] = color;
+                                pixels[width * y + x] = color;
                             }
                         }
                         break;
@@ -120,11 +124,11 @@ namespace CheapStyle
             _width = width;
             _height = height;
             _bgColor = bgColor;
-            _colors = imageColors;
+            _pixels = pixels;
 
             _bitmap = new WriteableBitmap(_width, _height, 96, 96, PixelFormats.Bgr565, null);
             _bitmap.Lock();
-            _bitmap.WritePixels(new Int32Rect(0, 0, _width, _height), _colors, _width * sizeof(ushort), 0);
+            _bitmap.WritePixels(new Int32Rect(0, 0, _width, _height), _pixels, _width * sizeof(ushort), 0);
             _bitmap.Unlock();
             _bitmap.Freeze();
         }
@@ -143,19 +147,32 @@ namespace CheapStyle
         {
             _width = 0;
             _height = 0;
-            _colors = null;
+            _pixels = null;
             _bitmap = null;
 
             if (image != null)
             {
                 _width = image._width;
                 _height = image._height;
-                _colors = image._colors;
+                _pixels = image._pixels;
                 _bitmap = image._bitmap;
             }
         }
 
-        public void Save(string filePath)
+        public string Name
+        {
+            get
+            {
+                return _name ?? _type.ToString();
+            }
+
+            set
+            {
+                _name = value;
+            }
+        }
+
+        public void SavePng(string filePath)
         {
             using (FileStream tempStream = new FileStream(filePath, FileMode.Create))
             {
