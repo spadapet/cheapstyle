@@ -155,7 +155,7 @@ namespace CheapStyle
             Bytes stream = new Bytes(bytes);
 
             _posFooter = stream.LoadInt();
-            stream.IntPos = _posFooter;
+            stream.Position = _posFooter;
 
             _posHeader = stream.LoadInt();
             _posStyle = stream.LoadInt();
@@ -183,7 +183,7 @@ namespace CheapStyle
 
             if (_posHeader != 0)
             {
-                stream.IntPos = _posHeader;
+                stream.Position = _posHeader;
                 Header = stream.LoadString();
             }
 
@@ -194,13 +194,13 @@ namespace CheapStyle
 
             if (_posStyle != 0)
             {
-                stream.IntPos = _posStyle;
+                stream.Position = _posStyle;
                 Name = stream.LoadString();
             }
 
             if (_posAuthor != 0)
             {
-                stream.IntPos = _posAuthor;
+                stream.Position = _posAuthor;
                 Author = stream.LoadString();
             }
         }
