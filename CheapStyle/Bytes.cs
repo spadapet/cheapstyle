@@ -8,44 +8,38 @@ namespace CheapStyle
     internal class Bytes
     {
         public byte[] Buffer { get; private set; }
-        public uint Position { get; set; }
+        public int Position { get; set; }
 
         public Bytes(byte[] buffer, int position = 0)
         {
             Buffer = buffer;
-            IntPos = position;
-        }
-
-        public int IntPos
-        {
-            get { return (int)Position; }
-            set { Position = (uint)value; }
+            Position = position;
         }
 
         public int LoadInt()
         {
-            int value = BitConverter.ToInt32(Buffer, IntPos);
+            int value = BitConverter.ToInt32(Buffer, Position);
             Position += sizeof(int);
             return value;
         }
 
         public uint LoadUint()
         {
-            uint value = BitConverter.ToUInt32(Buffer, IntPos);
+            uint value = BitConverter.ToUInt32(Buffer, Position);
             Position += sizeof(uint);
             return value;
         }
 
         public ushort LoadUshort()
         {
-            ushort value = BitConverter.ToUInt16(Buffer, IntPos);
+            ushort value = BitConverter.ToUInt16(Buffer, Position);
             Position += sizeof(ushort);
             return value;
         }
 
         public int LoadUshortAsInt()
         {
-            ushort value = BitConverter.ToUInt16(Buffer, IntPos);
+            ushort value = BitConverter.ToUInt16(Buffer, Position);
             Position += sizeof(ushort);
             return (int)value;
         }
@@ -68,8 +62,8 @@ namespace CheapStyle
         public string LoadString()
         {
             int length = LoadByteAsInt();
-            string value = Encoding.ASCII.GetString(Buffer, IntPos, length - 1);
-            IntPos += length;
+            string value = Encoding.ASCII.GetString(Buffer, Position, length - 1);
+            Position += length;
             return value;
         }
 
@@ -81,8 +75,8 @@ namespace CheapStyle
         public byte[] LoadBytes(int size)
         {
             byte[] bytes = new byte[size];
-            Array.Copy(Buffer, IntPos, bytes, 0, size);
-            IntPos += size;
+            Array.Copy(Buffer, Position, bytes, 0, size);
+            Position += size;
             return bytes;
         }
 

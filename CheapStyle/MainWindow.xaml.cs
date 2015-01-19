@@ -4,7 +4,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using Microsoft.Win32;
 
 namespace CheapStyle
 {
