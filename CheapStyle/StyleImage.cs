@@ -22,6 +22,7 @@ namespace CheapStyle
         private StyleImage(Bytes stream, StyleImageType type)
         {
             _type = type;
+            _name = type.ToString();
 
             Load(stream);
         }
@@ -181,7 +182,7 @@ namespace CheapStyle
         {
             get
             {
-                return _name ?? _type.ToString();
+                return _name;
             }
         }
 

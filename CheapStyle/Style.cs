@@ -35,6 +35,7 @@ namespace CheapStyle
         private StyleImage _imageGraphics;
         private IList<StyleImage> _imageOthers;
         private IList<StyleImage> _allImages;
+        private IList<StyleMusic> _musics;
 
         static Style()
         {
@@ -51,6 +52,7 @@ namespace CheapStyle
 
             _imageOthers = new List<StyleImage>();
             _allImages = new List<StyleImage>();
+            _musics = new List<StyleMusic>();
             _styleCache.Add(this);
 
             Load(System.IO.File.ReadAllBytes(filePath));
@@ -150,6 +152,14 @@ namespace CheapStyle
             get
             {
                 return _allImages;
+            }
+        }
+
+        public IEnumerable<StyleMusic> Musics
+        {
+            get
+            {
+                return _musics;
             }
         }
 
@@ -263,9 +273,22 @@ namespace CheapStyle
 
         private void LoadMusic(byte[] bytes)
         {
-            Bytes stream = new Bytes(bytes, _posMusic);
+            if (_posMusic != 0)
+            {
+                Bytes stream = new Bytes(bytes, _posMusic);
+                if (stream.LoadByte() != 1)
+                {
+                    throw new Exception("Invalid music type in style");
+                }
 
-            // TODO
+                int count = stream.LoadByteAsInt();
+                for (int i = 0; i < count; i++)
+                {
+                    int index = stream.LoadByteAsInt();
+                    StyleMusic music = new StyleMusic(stream, index);
+                    _musics.Add(music);
+                }
+            }
         }
 
         public void Save(string dest)
@@ -274,6 +297,12 @@ namespace CheapStyle
             {
                 string file = System.IO.Path.Combine(dest, image.Name + ".png");
                 image.SavePng(file);
+            }
+
+            foreach (StyleMusic music in Musics)
+            {
+                string file = System.IO.Path.Combine(dest, music.Name + ".mid");
+                music.SaveMidi(file);
             }
         }
     }
