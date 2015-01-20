@@ -36,6 +36,7 @@ namespace CheapStyle
         private IList<StyleImage> _imageOthers;
         private IList<StyleImage> _allImages;
         private IList<StyleMusic> _musics;
+        private IList<StyleSound> _sounds;
 
         static Style()
         {
@@ -53,6 +54,7 @@ namespace CheapStyle
             _imageOthers = new List<StyleImage>();
             _allImages = new List<StyleImage>();
             _musics = new List<StyleMusic>();
+            _sounds = new List<StyleSound>();
             _styleCache.Add(this);
 
             Load(System.IO.File.ReadAllBytes(filePath));
@@ -67,6 +69,16 @@ namespace CheapStyle
                 foreach (StyleImage image in AllImages)
                 {
                     image.Dispose();
+                }
+
+                foreach (StyleMusic music in Musics)
+                {
+                    music.Dispose();
+                }
+
+                foreach (StyleSound sound in Sounds)
+                {
+                    sound.Dispose();
                 }
             }
         }
@@ -160,6 +172,14 @@ namespace CheapStyle
             get
             {
                 return _musics;
+            }
+        }
+
+        public IEnumerable<StyleSound> Sounds
+        {
+            get
+            {
+                return _sounds;
             }
         }
 
@@ -266,9 +286,22 @@ namespace CheapStyle
 
         private void LoadSounds(byte[] bytes)
         {
-            Bytes stream = new Bytes(bytes, _posSounds);
+            if (_posSounds != 0)
+            {
+                Bytes stream = new Bytes(bytes, _posSounds);
+                if (stream.LoadByte() != 1)
+                {
+                    throw new Exception("Invalid sound type in style");
+                }
 
-            // TODO
+                int count = stream.LoadByteAsInt();
+                for (int i = 0; i < count; i++)
+                {
+                    int index = stream.LoadByteAsInt();
+                    StyleSound sound = new StyleSound(stream, index);
+                    _sounds.Add(sound);
+                }
+            }
         }
 
         private void LoadMusic(byte[] bytes)
@@ -303,6 +336,12 @@ namespace CheapStyle
             {
                 string file = System.IO.Path.Combine(dest, music.Name + ".mid");
                 music.SaveMidi(file);
+            }
+
+            foreach (StyleSound sound in Sounds)
+            {
+                string file = System.IO.Path.Combine(dest, sound.Name + ".wav");
+                sound.SaveWave(file);
             }
         }
     }
