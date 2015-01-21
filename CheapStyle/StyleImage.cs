@@ -285,6 +285,8 @@ namespace CheapStyle
             _height = 0;
             _pixels = null;
             _bitmap = null;
+            _sprites = null;
+            _objects = null;
 
             if (image != null)
             {
@@ -292,6 +294,8 @@ namespace CheapStyle
                 _height = image._height;
                 _pixels = image._pixels;
                 _bitmap = image._bitmap;
+                _sprites = image._sprites;
+                _objects = image._objects;
             }
         }
 
