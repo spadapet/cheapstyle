@@ -50,6 +50,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bytes.cs" />
+    <Compile Include="StyleObject.cs" />
+    <Compile Include="StyleSprite.cs" />
     <Compile Include="StyleSound.cs" />
     <Compile Include="StyleMusic.cs" />
     <Compile Include="StyleImage.cs" />

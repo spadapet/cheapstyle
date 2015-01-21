@@ -329,7 +329,12 @@ namespace CheapStyle
             foreach (StyleImage image in AllImages)
             {
                 string file = System.IO.Path.Combine(dest, image.Name + ".png");
+                string fileSprites = System.IO.Path.Combine(dest, image.Name + ".sprites.xml");
+                string fileObjects = System.IO.Path.Combine(dest, image.Name + ".objects.xml");
+
                 image.SavePng(file);
+                image.SaveSprites(fileSprites);
+                image.SaveObjects(fileObjects);
             }
 
             foreach (StyleMusic music in Musics)

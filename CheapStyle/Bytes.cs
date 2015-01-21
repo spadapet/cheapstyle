@@ -39,9 +39,19 @@ namespace CheapStyle
 
         public int LoadUshortAsInt()
         {
-            ushort value = BitConverter.ToUInt16(Buffer, Position);
-            Position += sizeof(ushort);
-            return (int)value;
+            return (int)LoadUshort();
+        }
+
+        public short LoadShort()
+        {
+            short value = BitConverter.ToInt16(Buffer, Position);
+            Position += sizeof(short);
+            return value;
+        }
+
+        public int LoadShortAsInt()
+        {
+            return (int)LoadShort();
         }
 
         public byte LoadByte()
