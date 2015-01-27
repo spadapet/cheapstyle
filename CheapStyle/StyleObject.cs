@@ -42,6 +42,9 @@ namespace CheapStyle
         public Int32Rect HitRect { get; set; }
         public int HitPointX { get; set; }
         public int HitPointY { get; set; }
+        public int HitCircleX { get; set; }
+        public int HitCircleY { get; set; }
+        public int HitCircleRadius { get; set; }
         public int Sound { get; set; }
 
         public StyleObject(StyleImage image, StyleObjectType type, StyleObjectSubType subType)

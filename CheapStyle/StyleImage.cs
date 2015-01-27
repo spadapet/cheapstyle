@@ -265,10 +265,21 @@ namespace CheapStyle
                             _objects[curObj] = new StyleObject(this, objType, subType);
                             _objects[curObj].SpriteStart = start;
                             _objects[curObj].SpriteCount = end - start + 1;
-                            _objects[curObj].HitRect = new Int32Rect(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
                             _objects[curObj].HitPointX = ptx;
                             _objects[curObj].HitPointY = pty;
                             _objects[curObj].Sound = sound;
+
+                            if (y2 == -9999) // it's a circle
+                            {
+                                _objects[curObj].HitCircleX = x1;
+                                _objects[curObj].HitCircleY = y1;
+                                _objects[curObj].HitCircleRadius = x2;
+                            }
+                            else
+                            {
+                                _objects[curObj].HitRect = new Int32Rect(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
+                            }
+
                             curObj++;
                         }
                         break;
@@ -375,19 +386,37 @@ namespace CheapStyle
                     int i = 0;
                     foreach (StyleObject obj in _objects)
                     {
-                        writer.WriteLine("    <Object Index='{0}' Type='{1}' SubType='{2}' SpriteStart='{3}' SpriteCount='{4}' HitRectX='{5}' HitRectY='{6}' HitRectWidth='{7}' HitRectHeight='{8}' HitPointX='{9}' HitPointY='{10}' Sound='{11}' />",
-                            i++,
-                            obj.Type,
-                            obj.SubType,
-                            obj.SpriteStart,
-                            obj.SpriteCount,
-                            obj.HitRect.X,
-                            obj.HitRect.Y,
-                            obj.HitRect.Width,
-                            obj.HitRect.Height,
-                            obj.HitPointX,
-                            obj.HitPointY,
-                            obj.Sound);
+                        if (obj.HitCircleRadius != 0)
+                        {
+                            writer.WriteLine("    <Object Index='{0}' Type='{1}' SubType='{2}' SpriteStart='{3}' SpriteCount='{4}' HitCircleX='{5}' HitCircleY='{6}' HitCircleRadius='{7}' HitPointX='{8}' HitPointY='{9}' Sound='{10}' />",
+                                i++,
+                                obj.Type,
+                                obj.SubType,
+                                obj.SpriteStart,
+                                obj.SpriteCount,
+                                obj.HitCircleX,
+                                obj.HitCircleY,
+                                obj.HitCircleRadius,
+                                obj.HitPointX,
+                                obj.HitPointY,
+                                obj.Sound);
+                        }
+                        else
+                        {
+                            writer.WriteLine("    <Object Index='{0}' Type='{1}' SubType='{2}' SpriteStart='{3}' SpriteCount='{4}' HitRectX='{5}' HitRectY='{6}' HitRectWidth='{7}' HitRectHeight='{8}' HitPointX='{9}' HitPointY='{10}' Sound='{11}' />",
+                                i++,
+                                obj.Type,
+                                obj.SubType,
+                                obj.SpriteStart,
+                                obj.SpriteCount,
+                                obj.HitRect.X,
+                                obj.HitRect.Y,
+                                obj.HitRect.Width,
+                                obj.HitRect.Height,
+                                obj.HitPointX,
+                                obj.HitPointY,
+                                obj.Sound);
+                        }
                     }
 
                     writer.WriteLine("</Objects>");
