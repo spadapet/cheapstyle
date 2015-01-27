@@ -340,7 +340,24 @@ namespace CheapStyle
                 using (FileStream stream = new FileStream(filePath, FileMode.Create))
                 using (TextWriter writer = new StreamWriter(stream, Encoding.ASCII))
                 {
-                    writer.WriteLine("<TODO>\r\n</TODO>");
+                    writer.WriteLine("<?xml version='1.0' ?>");
+                    writer.WriteLine("<Sprites>");
+
+                    int i = 0;
+                    foreach (StyleSprite sprite in _sprites)
+                    {
+                        writer.WriteLine("    <Sprite Index='{0}' StartX='{4}' StartY='{5}' Width='{6}' Height='{7}' HandleX='{2}' HandleY='{3}' Metal='{1}' />",
+                            i++,
+                            sprite.Metal,
+                            sprite.HandleX,
+                            sprite.HandleY,
+                            sprite.Rect.X,
+                            sprite.Rect.Y,
+                            sprite.Rect.Width,
+                            sprite.Rect.Height);
+                    }
+
+                    writer.WriteLine("</Sprites>");
                 }
             }
         }
@@ -352,7 +369,28 @@ namespace CheapStyle
                 using (FileStream stream = new FileStream(filePath, FileMode.Create))
                 using (TextWriter writer = new StreamWriter(stream, Encoding.ASCII))
                 {
-                    writer.WriteLine("<TODO>\r\n</TODO>");
+                    writer.WriteLine("<?xml version='1.0' ?>");
+                    writer.WriteLine("<Objects>");
+
+                    int i = 0;
+                    foreach (StyleObject obj in _objects)
+                    {
+                        writer.WriteLine("    <Object Index='{0}' Type='{1}' SubType='{2}' SpriteStart='{3}' SpriteCount='{4}' HitRectX='{5}' HitRectY='{6}' HitRectWidth='{7}' HitRectHeight='{8}' HitPointX='{9}' HitPointY='{10}' Sound='{11}' />",
+                            i++,
+                            obj.Type,
+                            obj.SubType,
+                            obj.SpriteStart,
+                            obj.SpriteCount,
+                            obj.HitRect.X,
+                            obj.HitRect.Y,
+                            obj.HitRect.Width,
+                            obj.HitRect.Height,
+                            obj.HitPointX,
+                            obj.HitPointY,
+                            obj.Sound);
+                    }
+
+                    writer.WriteLine("</Objects>");
                 }
             }
         }
