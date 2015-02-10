@@ -183,7 +183,7 @@ namespace CheapStyle
                 int bottom = stream.LoadUshortAsInt();
 
                 _sprites[cur] = new StyleSprite(this);
-                _sprites[cur].Rect = new Int32Rect(left, top, right - left + 1, bottom - top + 1);
+                _sprites[cur].Rect = new Int32Rect(left, top, right - left, bottom - top);
             }
         }
 
