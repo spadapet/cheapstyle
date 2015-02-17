@@ -45,11 +45,12 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </ApplicationDefinition>
+    </Page>
     <Compile Include="Bytes.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="StyleObject.cs" />
     <Compile Include="StyleSprite.cs" />
     <Compile Include="StyleSound.cs" />
